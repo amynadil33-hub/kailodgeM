@@ -18,8 +18,16 @@ export const metadata: Metadata = {
   },
   description:
     'Kai Lodge is a boutique guesthouse on Muranga Magu, Malé. Comfortable rooms, personalised stays and easy access to the city, IGMH and Rasfannu Beach.',
-  generator: 'v0.app',
-  icons: { icon: '/images/kai-lodge-logo.jpg', apple: '/images/kai-lodge-logo.jpg' },
+  applicationName: 'Kai Lodge Maldives',
+  icons: {
+    icon: [
+      { url: '/icon-light-32x32.png', type: 'image/png', sizes: '32x32' },
+      { url: '/kai-lodge-icon-192x192.png', type: 'image/png', sizes: '192x192' },
+      { url: '/kai-lodge-icon-512x512.png', type: 'image/png', sizes: '512x512' },
+    ],
+    shortcut: '/icon-light-32x32.png',
+    apple: [{ url: '/apple-icon.png', type: 'image/png', sizes: '180x180' }],
+  },
 }
 
 export const viewport: Viewport = {
