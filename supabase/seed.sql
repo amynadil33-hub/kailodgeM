@@ -77,16 +77,20 @@ on conflict (slug) do nothing;
 insert into public.media (url, alt, category, room_type_id, sort)
 select v.url, v.alt, v.category, t.id, v.sort
   from (values
-    ('/images/room-queen-1.png', 'Queen room with white linen', 'room', 'queen-room', 1),
-    ('/images/room-queen-2.png', 'In-room coffee, kettle and mini refrigerator', 'room', 'queen-room', 2),
+    ('/images/room-queen-1.png', 'Deluxe queen room with city view and recliner', 'room', 'queen-room', 1),
+    ('/images/room-grey-suite.jpg', 'Grey queen room with chandelier and full-height windows', 'room', 'queen-room', 2),
     ('/images/room-balcony-1.png', 'Room opening onto a balcony above Malé', 'room', 'balcony-city-view', 1),
-    ('/images/room-balcony-2.png', 'Balcony seating at dusk', 'room', 'balcony-city-view', 2),
     ('/images/room-recliner-1.png', 'Room with recliner and foot massager', 'room', 'recliner-comfort', 1),
     ('/images/property-entrance.png', 'Entrance lobby', 'property', null, 1),
     ('/images/property-kitchen.png', 'Shared guest kitchen', 'property', null, 2),
     ('/images/property-laundry.png', 'Guest laundry', 'property', null, 3),
+    ('/images/motorcycle-rental.jpeg', 'Motorcycle rental for in-house guests', 'property', null, 4),
+    ('/images/property-bathroom.jpg', 'Modern guest bathroom with rainfall shower', 'property', null, 5),
     ('/images/decor-birthday.png', 'Birthday room setup', 'occasion', null, 1),
     ('/images/decor-romantic.png', 'Romantic room setup', 'occasion', null, 2),
+    ('/images/promo-deluxe-balcony.jpeg', 'Deluxe Queen Room with balcony promotional artwork', 'room', null, 10),
+    ('/images/promo-deluxe-city.jpeg', 'Deluxe Queen Room with city view promotional artwork', 'room', null, 11),
+    ('/images/promo-superior-queen.jpeg', 'Superior Queen Room promotional artwork', 'room', null, 12),
     ('/images/male-waterfront.png', 'Malé waterfront at sunset', 'neighbourhood', null, 1),
     ('/images/male-cafe.png', 'Local café in Malé', 'neighbourhood', null, 2),
     ('/images/male-beach.png', 'City beach in Malé', 'neighbourhood', null, 3),

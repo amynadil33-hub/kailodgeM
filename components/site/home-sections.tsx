@@ -10,8 +10,8 @@ export function HomeHero({ content }: { content: SiteData['content'] }) {
   return (
     <section className="relative isolate overflow-hidden bg-ink text-ink-foreground">
       <Image
-        src={content['home.hero_image'] || '/images/hero-male-night.png'}
-        alt="Aerial view of Malé at night, its streets glowing with city lights beside the ocean"
+        src={content['home.hero_image'] || '/images/room-balcony-1.png'}
+        alt="Kai Lodge queen room with warm lighting, a hanging chair and private balcony"
         fill
         priority
         sizes="100vw"
@@ -55,7 +55,7 @@ export function HomeIntro({ content, address }: { content: SiteData['content']; 
       <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-muted md:col-span-6 lg:col-span-6 lg:col-start-7">
         <Image
           src={content['home.intro_image'] || '/images/property-entrance.png'}
-          alt="The warm, welcoming entrance of Kai Lodge"
+          alt="The warm, welcoming Kai Lodge entrance and reception"
           fill
           sizes="(min-width: 768px) 50vw, 100vw"
           className="object-cover"

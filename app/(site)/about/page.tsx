@@ -31,7 +31,7 @@ export default async function AboutPage() {
         <div className="relative aspect-[4/3] overflow-hidden rounded-lg lg:col-span-6">
           <Image
             src={content['about.image'] || '/images/property-entrance.png'}
-            alt="Kai Lodge entrance"
+            alt="Kai Lodge entrance and reception lobby"
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover"

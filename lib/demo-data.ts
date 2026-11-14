@@ -10,7 +10,7 @@ import type {
 
 /**
  * Sample data used only when Supabase is not configured.
- * Rates, room types and photos are placeholders — replace them through the admin portal.
+ * Rates and room types are examples; photography uses Kai Lodge source material.
  */
 
 export const DEMO_SETTINGS: SiteSettings = {
@@ -93,18 +93,20 @@ const img = (
 ): MediaItem => ({ id, url, alt, category, room_type_id, sort, caption })
 
 export const DEMO_MEDIA: MediaItem[] = [
-  img('m1', '/images/room-queen-1.png', 'Queen room with white linen and soft bedside lighting', 'room', 'rt-queen', 1),
-  img('m2', '/images/room-queen-2.png', 'In-room coffee, kettle, mini refrigerator and safe locker', 'room', 'rt-queen', 2),
-  img('m3', '/images/room-family-1.png', 'Bright room with fresh towels laid out', 'room', 'rt-queen', 3),
+  img('m1', '/images/room-queen-1.png', 'Deluxe queen room with city view and recliner', 'room', 'rt-queen', 1),
+  img('m2', '/images/room-grey-suite.jpg', 'Grey queen room with chandelier and full-height windows', 'room', 'rt-queen', 2),
   img('m4', '/images/room-balcony-1.png', 'Room opening onto a balcony above the rooftops of Malé', 'room', 'rt-balcony', 1),
-  img('m5', '/images/room-balcony-2.png', 'Balcony seating overlooking the city at dusk', 'room', 'rt-balcony', 2),
   img('m6', '/images/room-recliner-1.png', 'Room with a recliner, foot massager and Smart TV', 'room', 'rt-recliner', 1),
-  img('m7', '/images/room-queen-2.png', 'Coffee and tea tray with kettle', 'room', 'rt-recliner', 2),
   img('m8', '/images/property-entrance.png', 'Warm, welcoming entrance lobby', 'property', null, 1),
   img('m9', '/images/property-kitchen.png', 'Shared guest kitchen with microwave and rice cooker', 'property', null, 2),
   img('m10', '/images/property-laundry.png', 'Guest laundry with washing machine and iron', 'property', null, 3),
+  img('m19', '/images/motorcycle-rental.jpeg', 'Motorcycle rental available for in-house guests', 'property', null, 4),
+  img('m20', '/images/property-bathroom.jpg', 'Modern guest bathroom with rainfall shower', 'property', null, 5),
   img('m11', '/images/decor-birthday.png', 'Birthday room setup with balloons and cake', 'occasion', null, 1),
   img('m12', '/images/decor-romantic.png', 'Romantic setup with rose petals and candles', 'occasion', null, 2),
+  img('m21', '/images/promo-deluxe-balcony.jpeg', 'Deluxe Queen Room with balcony promotional artwork', 'room', null, 10),
+  img('m22', '/images/promo-deluxe-city.jpeg', 'Deluxe Queen Room with city view promotional artwork', 'room', null, 11),
+  img('m23', '/images/promo-superior-queen.jpeg', 'Superior Queen Room promotional artwork', 'room', null, 12),
   img('m13', '/images/male-waterfront.png', 'Dhoni boats on the Malé waterfront at sunset', 'neighbourhood', null, 1),
   img('m14', '/images/male-cafe.png', 'Evening at a local café in Malé', 'neighbourhood', null, 2),
   img('m15', '/images/male-beach.png', 'Swimmers at the city beach in Malé', 'neighbourhood', null, 3),

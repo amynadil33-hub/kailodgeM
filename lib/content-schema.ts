@@ -13,7 +13,7 @@ export const CONTENT_FIELDS: ContentField[] = [
   { page: 'Home', key: 'home.hero_eyebrow', label: 'Hero eyebrow', type: 'text', default: 'Muranga Magu · Malé' },
   { page: 'Home', key: 'home.hero_title', label: 'Hero title', type: 'text', default: 'Your Comfortable Stay in the Heart of Malé.' },
   { page: 'Home', key: 'home.hero_subtitle', label: 'Hero subtitle', type: 'textarea', default: 'A stay shaped around you — a calm, personal base in the middle of the capital’s everyday life.' },
-  { page: 'Home', key: 'home.hero_image', label: 'Hero photograph', type: 'image', default: '/images/hero-male-night.png' },
+  { page: 'Home', key: 'home.hero_image', label: 'Hero photograph', type: 'image', default: '/images/room-balcony-1.png' },
   { page: 'Home', key: 'home.intro_title', label: 'Introduction title', type: 'text', default: 'A city retreat, kept personal.' },
   { page: 'Home', key: 'home.intro_body', label: 'Introduction text', type: 'textarea', default: 'Kai Lodge is a boutique guesthouse for couples, locals visiting the capital, international travellers, business guests and families. Step out into the scooters, cafés and waterfront of Malé — then come back to a quiet, comfortable room that has been prepared around your plans.' },
   { page: 'Home', key: 'home.intro_image', label: 'Introduction photograph', type: 'image', default: '/images/property-entrance.png' },
@@ -49,7 +49,7 @@ export const CONTENT_FIELDS: ContentField[] = [
   // About
   { page: 'About', key: 'about.title', label: 'Page title', type: 'text', default: 'About Kai Lodge' },
   { page: 'About', key: 'about.story', label: 'Property story', type: 'textarea', default: 'Kai Lodge was created as a comfortable, personal place to stay in central Malé — somewhere that feels calm the moment you close the door, while the life of the city carries on outside. We keep things simple, clean and attentive, and we are always a message away.' },
-  { page: 'About', key: 'about.image', label: 'Story photograph', type: 'image', default: '/images/male-neighbourhood.png' },
+  { page: 'About', key: 'about.image', label: 'Story photograph', type: 'image', default: '/images/property-entrance.png' },
   { page: 'About', key: 'about.igmh_body', label: 'IGMH highlight', type: 'textarea', default: 'Indira Gandhi Memorial Hospital (IGMH) is nearby — convenient for guests visiting Malé for appointments or to be close to family.' },
   { page: 'About', key: 'about.beach_body', label: 'Rasfannu Beach highlight', type: 'textarea', default: 'Rasfannu, Malé’s artificial beach on the western waterfront, is within reach for an evening swim or a walk along the sea.' },
 
