@@ -13,7 +13,7 @@ export const CONTENT_FIELDS: ContentField[] = [
   { page: 'Home', key: 'home.hero_eyebrow', label: 'Hero eyebrow', type: 'text', default: 'Muranga Magu · Malé' },
   { page: 'Home', key: 'home.hero_title', label: 'Hero title', type: 'text', default: 'Your Comfortable Stay in the Heart of Malé.' },
   { page: 'Home', key: 'home.hero_subtitle', label: 'Hero subtitle', type: 'textarea', default: 'A stay shaped around you — a calm, personal base in the middle of the capital’s everyday life.' },
-  { page: 'Home', key: 'home.hero_image', label: 'Hero photograph', type: 'image', default: '/images/room-balcony-1.png' },
+  { page: 'Home', key: 'home.hero_image', label: 'Hero photograph', type: 'image', default: '/images/hero-kai-lodge-balcony.png' },
   { page: 'Home', key: 'home.intro_title', label: 'Introduction title', type: 'text', default: 'A city retreat, kept personal.' },
   { page: 'Home', key: 'home.intro_body', label: 'Introduction text', type: 'textarea', default: 'Kai Lodge is a boutique guesthouse for couples, locals visiting the capital, international travellers, business guests and families. Step out into the scooters, cafés and waterfront of Malé — then come back to a quiet, comfortable room that has been prepared around your plans.' },
   { page: 'Home', key: 'home.intro_image', label: 'Introduction photograph', type: 'image', default: '/images/property-entrance.png' },
@@ -37,7 +37,7 @@ export const CONTENT_FIELDS: ContentField[] = [
   // Personalise
   { page: 'Personalise', key: 'personalise.title', label: 'Page title', type: 'text', default: 'Personalise your stay' },
   { page: 'Personalise', key: 'personalise.intro', label: 'Page introduction', type: 'textarea', default: 'From a birthday surprise to a month-long stay, tell us what you have in mind. Fixed-price setups can be added when you book; anything custom is quoted first, and you approve the price before it is added.' },
-  { page: 'Personalise', key: 'personalise.image', label: 'Header photograph', type: 'image', default: '/images/decor-romantic.png' },
+  { page: 'Personalise', key: 'personalise.image', label: 'Header photograph', type: 'image', default: '/images/kai-lodge-event-anniversary-1.jpeg' },
   { page: 'Personalise', key: 'personalise.transfer_body', label: 'Airport transfer text', type: 'textarea', default: 'Share your flight details and we can help arrange a transfer from Velana International Airport. Availability and price are confirmed by our team.' },
   { page: 'Personalise', key: 'personalise.arrival_body', label: 'Early / late arrival text', type: 'textarea', default: 'Landing early or leaving late? Request an early check-in or late check-out. These depend on room availability and may carry an additional charge.' },
   { page: 'Personalise', key: 'personalise.extended_body', label: 'Extended stay text', type: 'textarea', default: 'Staying a few weeks or longer for work, study or medical visits? Ask us about monthly stays and we will reply with a tailored quote.' },

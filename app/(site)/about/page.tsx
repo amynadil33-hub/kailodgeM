@@ -18,8 +18,8 @@ export default async function AboutPage() {
       <PageHero
         eyebrow="About & Location"
         title={content['about.title']}
-        image="/images/male-neighbourhood.png"
-        imageAlt="A quiet residential lane in Henveiru, Malé"
+        image="/images/kai-lodge-surrounding-city.jpeg"
+        imageAlt="Modern buildings and palm trees in central Malé near Kai Lodge"
       />
 
       <section className="mx-auto grid max-w-7xl gap-12 px-4 py-20 md:px-8 md:py-28 lg:grid-cols-12 lg:items-center">

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const SECTIONS: { category: MediaItem['category']; title: string }[] = [
   { category: 'room', title: 'Rooms' },
   { category: 'property', title: 'The lodge' },
-  { category: 'occasion', title: 'Occasions' },
+  { category: 'occasion', title: 'Events & occasions' },
   { category: 'neighbourhood', title: 'Around Malé' },
 ]
 

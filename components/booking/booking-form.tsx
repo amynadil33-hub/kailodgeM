@@ -40,7 +40,7 @@ export function BookingForm({ roomType, search, packages, settings, initialQuote
   const [codeMessage, setCodeMessage] = useState<{ ok: boolean; text: string } | null>(null)
   const [requests, setRequests] = useState<Partial<Record<RequestKind, string>>>({})
   const [error, setError] = useState<string | null>(null)
-  const [demoResult, setDemoResult] = useState<{ reference: string; quote: Quote } | null>(null)
+  const [demoResult, setDemoResult] = useState<{ reference: string; quote: Quote; emailed: boolean } | null>(null)
   const [quoting, startQuote] = useTransition()
   const [submitting, startSubmit] = useTransition()
 
@@ -101,12 +101,13 @@ export function BookingForm({ roomType, search, packages, settings, initialQuote
     startSubmit(async () => {
       const res = await createBooking(payload)
       if (!res.ok) return setError(res.error)
-      if ('demo' in res) return setDemoResult({ reference: res.reference, quote: res.quote })
+      if ('demo' in res) return setDemoResult({ reference: res.reference, quote: res.quote, emailed: res.emailed })
       router.push(`/booking/${res.token}`)
     })
   }
 
-  if (demoResult) return <DemoConfirmation reference={demoResult.reference} quote={demoResult.quote} settings={settings} />
+  if (demoResult)
+    return <DemoConfirmation reference={demoResult.reference} quote={demoResult.quote} settings={settings} emailed={demoResult.emailed} />
 
   const pricedPackages = packages.filter((p) => p.price !== null)
   const quotedPackages = packages.filter((p) => p.price === null)
@@ -273,7 +274,7 @@ export function BookingForm({ roomType, search, packages, settings, initialQuote
 
           {demo && (
             <p className="rounded-md bg-gold/10 p-3 text-xs leading-relaxed text-foreground">
-              Demo mode — sample prices. Submitting will show a sample confirmation; nothing is saved.
+              Demo pricing — submitting emails the request to Kai Lodge when email delivery is configured.
             </p>
           )}
 

@@ -28,8 +28,8 @@ export default async function PersonalisePage() {
         eyebrow="Personalise"
         title={content['personalise.title']}
         intro={content['personalise.intro']}
-        image={content['personalise.image'] || '/images/decor-romantic.png'}
-        imageAlt="A room decorated with candles and rose petals"
+        image={content['personalise.image'] || '/images/kai-lodge-event-anniversary-1.jpeg'}
+        imageAlt="Kai Lodge anniversary room decorated with rose petals and heart balloons"
       />
 
       <section className="mx-auto flex max-w-7xl flex-col gap-12 px-4 py-20 md:px-8 md:py-28">

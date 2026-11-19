@@ -10,7 +10,7 @@ export function HomeHero({ content }: { content: SiteData['content'] }) {
   return (
     <section className="relative isolate overflow-hidden bg-ink text-ink-foreground">
       <Image
-        src={content['home.hero_image'] || '/images/room-balcony-1.png'}
+        src={content['home.hero_image'] || '/images/hero-kai-lodge-balcony.png'}
         alt="Kai Lodge queen room with warm lighting, a hanging chair and private balcony"
         fill
         priority

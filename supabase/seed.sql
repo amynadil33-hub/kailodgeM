@@ -2,9 +2,9 @@
 -- Room types, rates, room names and packages below are SAMPLES. Replace them in the admin portal
 -- (Rooms, Rates, Personalise) before taking real bookings. No fees or bank accounts are seeded.
 
-insert into public.site_settings (id, base_currency, advance_percent, payment_deadline_hours, early_late_policy)
-values (1, 'MVR', 50, 24, 'Early check-in and late check-out are subject to availability and additional charges.')
-on conflict (id) do nothing;
+insert into public.site_settings (id, base_currency, advance_percent, payment_deadline_hours, email, early_late_policy)
+values (1, 'MVR', 50, 24, 'kailodgemv@gmail.com', 'Early check-in and late check-out are subject to availability and additional charges.')
+on conflict (id) do update set email = excluded.email;
 
 insert into public.amenities (slug, name, icon, scope, sort) values
   ('queen-bed', 'Queen-size bed', 'bed-double', 'room', 1),
@@ -70,8 +70,8 @@ on conflict (name) do nothing;
 -- SAMPLE fixed-price decoration packages (set price to null to make one quote-only)
 insert into public.packages (slug, name, description, price, image_url, sort) values
   ('birthday', 'Birthday setup', 'Balloons, fairy lights and a celebratory room setup waiting when you arrive.', 600, '/images/decor-birthday.png', 1),
-  ('anniversary', 'Anniversary setup', 'Rose petals, candles and a softly lit room for a quiet celebration together.', 750, '/images/decor-romantic.png', 2),
-  ('romantic', 'Romantic evening', 'Rose petals on the bed, candles and towel art — a simple, thoughtful surprise.', 500, '/images/decor-romantic.png', 3)
+  ('anniversary', 'Anniversary setup', 'Rose petals, candles and a softly lit room for a quiet celebration together.', 750, '/images/kai-lodge-event-anniversary-1.jpeg', 2),
+  ('romantic', 'Romantic evening', 'Rose petals on the bed, candles and towel art — a simple, thoughtful surprise.', 500, '/images/kai-lodge-event-anniversary-2.jpeg', 3)
 on conflict (slug) do nothing;
 
 insert into public.media (url, alt, category, room_type_id, sort)
@@ -80,6 +80,11 @@ select v.url, v.alt, v.category, t.id, v.sort
     ('/images/room-queen-1.png', 'Deluxe queen room with city view and recliner', 'room', 'queen-room', 1),
     ('/images/room-grey-suite.jpg', 'Grey queen room with chandelier and full-height windows', 'room', 'queen-room', 2),
     ('/images/room-balcony-1.png', 'Room opening onto a balcony above Malé', 'room', 'balcony-city-view', 1),
+    ('/images/holiday-getaway-room.jpeg', 'Holiday Getaway queen room with hanging chair', 'room', 'balcony-city-view', 2),
+    ('/images/holiday-getaway-balcony-day.jpeg', 'Private balcony seating with flowers in daylight', 'room', 'balcony-city-view', 3),
+    ('/images/holiday-getaway-balcony-night.jpeg', 'Private balcony with warm evening lights', 'room', 'balcony-city-view', 4),
+    ('/images/holiday-getaway-swing-chair.jpeg', 'Hanging chair and wardrobe in the Holiday Getaway room', 'room', 'balcony-city-view', 5),
+    ('/images/holiday-getaway-bed.jpeg', 'Warmly lit queen bed in the Holiday Getaway room', 'room', 'balcony-city-view', 6),
     ('/images/room-recliner-1.png', 'Room with recliner and foot massager', 'room', 'recliner-comfort', 1),
     ('/images/property-entrance.png', 'Entrance lobby', 'property', null, 1),
     ('/images/property-kitchen.png', 'Shared guest kitchen', 'property', null, 2),
@@ -88,20 +93,23 @@ select v.url, v.alt, v.category, t.id, v.sort
     ('/images/property-bathroom.jpg', 'Modern guest bathroom with rainfall shower', 'property', null, 5),
     ('/images/decor-birthday.png', 'Birthday room setup', 'occasion', null, 1),
     ('/images/decor-romantic.png', 'Romantic room setup', 'occasion', null, 2),
+    ('/images/kai-lodge-event-anniversary-1.jpeg', 'Anniversary bed setup with rose petals and heart balloons', 'occasion', null, 3),
+    ('/images/kai-lodge-event-anniversary-2.jpeg', 'Romantic anniversary room decoration at Kai Lodge', 'occasion', null, 4),
+    ('/images/holiday-getaway-promo.jpeg', 'Kai Lodge Holiday Getaway promotional artwork', 'room', null, 13),
     ('/images/promo-deluxe-balcony.jpeg', 'Deluxe Queen Room with balcony promotional artwork', 'room', null, 10),
     ('/images/promo-deluxe-city.jpeg', 'Deluxe Queen Room with city view promotional artwork', 'room', null, 11),
     ('/images/promo-superior-queen.jpeg', 'Superior Queen Room promotional artwork', 'room', null, 12),
-    ('/images/male-waterfront.png', 'Malé waterfront at sunset', 'neighbourhood', null, 1),
-    ('/images/male-cafe.png', 'Local café in Malé', 'neighbourhood', null, 2),
-    ('/images/male-beach.png', 'City beach in Malé', 'neighbourhood', null, 3),
+    ('/images/kai-lodge-surrounding-igmh.jpeg', 'Indira Gandhi Memorial Hospital near Kai Lodge', 'neighbourhood', null, 1),
+    ('/images/kai-lodge-surrounding-city.jpeg', 'Modern buildings and palms in central Malé near Kai Lodge', 'neighbourhood', null, 2),
+    ('/images/kai-lodge-surrounding-beach.jpeg', 'The beach and waterfront near Kai Lodge', 'neighbourhood', null, 3),
     ('/images/male-neighbourhood.png', 'Residential lane in Malé', 'neighbourhood', null, 4)
   ) as v(url, alt, category, room_slug, sort)
   left join public.room_types t on t.slug = v.room_slug;
 
 insert into public.places (name, description, image_url, sort) values
-  ('Local cafés & short eats', 'Tea, hedhikaa and conversation in the cafés around us.', '/images/male-cafe.png', 1),
-  ('The waterfront', 'Watch dhonis come and go along the harbour at sunset.', '/images/male-waterfront.png', 2),
-  ('Rasfannu Beach', 'Malé’s artificial city beach — a favourite for an evening swim.', '/images/male-beach.png', 3),
+  ('Near IGMH', 'Indira Gandhi Memorial Hospital is close by for appointments and family visits.', '/images/kai-lodge-surrounding-igmh.jpeg', 1),
+  ('Central Malé', 'Modern city buildings, shops and everyday essentials surround the lodge.', '/images/kai-lodge-surrounding-city.jpeg', 2),
+  ('Rasfannu Beach', 'Malé’s artificial city beach — a favourite for an evening swim.', '/images/kai-lodge-surrounding-beach.jpeg', 3),
   ('Neighbourhood lanes', 'Corner shops and everyday life just beyond the front door.', '/images/male-neighbourhood.png', 4);
 
 -- Make your first owner account (sign up at /admin/login first, then run with your email):

@@ -17,15 +17,27 @@ const SAMPLE_ACCOUNT = {
   sort: 0,
 }
 
-export function DemoConfirmation({ reference, quote, settings }: { reference: string; quote: Quote; settings: SiteSettings }) {
+export function DemoConfirmation({
+  reference,
+  quote,
+  settings,
+  emailed,
+}: {
+  reference: string
+  quote: Quote
+  settings: SiteSettings
+  emailed: boolean
+}) {
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-10">
       <div className="flex flex-col items-start gap-4">
         <CheckCircle2 className="size-10 text-gold" aria-hidden />
-        <h2 className="font-serif text-4xl text-balance">Sample booking received</h2>
+        <h2 className="font-serif text-4xl text-balance">{emailed ? 'Booking request sent' : 'Sample booking received'}</h2>
         <p className="leading-relaxed text-muted-foreground">
-          This is how guests see their confirmation. In demo mode nothing is saved — connect Supabase to take real
-          bookings. Reference <span className="font-mono text-foreground">{reference}</span>
+          {emailed
+            ? 'Your booking request has been emailed to Kai Lodge. The team will contact you to confirm availability and payment details.'
+            : 'Email delivery is not configured, so this request was not sent. Please contact Kai Lodge by WhatsApp.'}{' '}
+          Reference <span className="font-mono text-foreground">{reference}</span>
         </p>
       </div>
       <QuoteSummary quote={quote} />

@@ -8,6 +8,7 @@ import {
   snapshotFor,
 } from '@/lib/booking-server'
 import { hasServiceRole } from '@/lib/env'
+import { sendWebsiteEmail } from '@/lib/email'
 import { rateLimit } from '@/lib/rate-limit'
 import { createServiceClient } from '@/lib/supabase/service'
 import type { Quote, RequestKind } from '@/lib/types'
@@ -54,7 +55,7 @@ export interface BookingSubmission extends QuoteRequest {
 
 export type BookingResult =
   | { ok: true; token: string; reference: string }
-  | { ok: true; demo: true; reference: string; quote: Quote }
+  | { ok: true; demo: true; reference: string; quote: Quote; emailed: boolean }
   | { ok: false; error: string }
 
 const CUSTOM_KINDS: RequestKind[] = [
@@ -119,8 +120,32 @@ export async function createBooking(input: BookingSubmission): Promise<BookingRe
       })),
   ]
 
+  const bookingEmail = (reference: string) =>
+    sendWebsiteEmail({
+      subject: `New website booking request — ${reference}`,
+      replyTo: email,
+      text: [
+        `Booking reference: ${reference}`,
+        `Guest: ${fullName}`,
+        `Email: ${email}`,
+        `Phone / WhatsApp: ${phone}`,
+        `Country: ${clean(input.country, 80) || 'Not provided'}`,
+        `Room: ${priced.roomType.name}`,
+        `Stay: ${search.checkIn} to ${search.checkOut} (${priced.quote.nights} night${priced.quote.nights === 1 ? '' : 's'})`,
+        `Guests: ${search.adults} adult${search.adults === 1 ? '' : 's'}, ${search.children} child${search.children === 1 ? '' : 'ren'}`,
+        `Total: ${priced.quote.currency} ${priced.quote.grand_total.toFixed(2)}`,
+        `Advance: ${priced.quote.currency} ${priced.quote.advance_amount.toFixed(2)}`,
+        `Arrival details: ${clean(input.arrivalDetails, 1000) || 'Not provided'}`,
+        `Special requests: ${clean(input.specialRequests, 2000) || 'None'}`,
+        requests.length
+          ? `Requested extras:\n${requests.map((request) => `- ${request.title}${'details' in request && request.details ? `: ${request.details}` : ''}`).join('\n')}`
+          : 'Requested extras: None',
+      ].join('\n'),
+    })
+
   if (!hasServiceRole() || priced.site.demo) {
-    return { ok: true, demo: true, reference: 'KL-DEMO00', quote: priced.quote }
+    const delivery = await bookingEmail('KL-WEB-REQUEST')
+    return { ok: true, demo: true, reference: 'KL-WEB-REQUEST', quote: priced.quote, emailed: delivery.ok }
   }
 
   const { data, error } = await createServiceClient().rpc('create_booking', {
@@ -150,6 +175,7 @@ export async function createBooking(input: BookingSubmission): Promise<BookingRe
   }
 
   const row = (Array.isArray(data) ? data[0] : data) as { access_token: string; reference: string }
+  await bookingEmail(row.reference)
   return { ok: true, token: row.access_token, reference: row.reference }
 }
 
@@ -157,10 +183,10 @@ async function bookingIdForToken(token: string) {
   if (!TOKEN.test(token) || !hasServiceRole()) return null
   const { data } = await createServiceClient()
     .from('bookings')
-    .select('id, currency, reservation_status')
+    .select('id, reference, currency, reservation_status')
     .eq('access_token', token)
     .maybeSingle()
-  return data as { id: string; currency: string; reservation_status: string } | null
+  return data as { id: string; reference: string; currency: string; reservation_status: string } | null
 }
 
 export async function submitPaymentReference(
@@ -187,6 +213,16 @@ export async function submitPaymentReference(
     reference_note: note,
   })
   if (error) return { ok: false, error: 'Could not save your payment details. Please try again.' }
+  await sendWebsiteEmail({
+    subject: `Payment reference submitted — ${booking.reference}`,
+    text: [
+      `Booking reference: ${booking.reference}`,
+      `Amount reported: ${booking.currency} ${amount.toFixed(2)}`,
+      `Transaction reference: ${note}`,
+      '',
+      'Please verify this transfer in the Kai Lodge admin dashboard.',
+    ].join('\n'),
+  })
   revalidatePath(`/booking/${token}`)
   return { ok: true }
 }
@@ -219,7 +255,7 @@ export async function sendEnquiry(input: {
   subject: string
   message: string
   website?: string
-}): Promise<{ ok: boolean; demo?: boolean; error?: string }> {
+}): Promise<{ ok: boolean; demo?: boolean; emailed?: boolean; error?: string }> {
   if (clean(input.website)) return { ok: true }
   if (!(await rateLimit('enquiry', 5, 10 * 60_000))) return { ok: false, error: 'Too many messages. Please try later.' }
   const name = clean(input.name, 120)
@@ -229,14 +265,34 @@ export async function sendEnquiry(input: {
   if (name.length < 2) return { ok: false, error: 'Please enter your name.' }
   if (!EMAIL.test(email) && !PHONE.test(phone)) return { ok: false, error: 'Please add an email or phone number.' }
   if (message.length < 5) return { ok: false, error: 'Please write a short message.' }
-  if (!hasServiceRole()) return { ok: true, demo: true }
-  const { error } = await createServiceClient().from('enquiries').insert({
-    name,
-    email: email || null,
-    phone: phone || null,
-    subject: clean(input.subject, 160) || null,
-    message,
+  const subject = clean(input.subject, 160) || 'Website enquiry'
+  let stored = false
+  if (hasServiceRole()) {
+    const { error } = await createServiceClient().from('enquiries').insert({
+      name,
+      email: email || null,
+      phone: phone || null,
+      subject,
+      message,
+    })
+    if (error) return { ok: false, error: 'Could not send your message. Please try WhatsApp instead.' }
+    stored = true
+  }
+
+  const delivery = await sendWebsiteEmail({
+    subject: `Kai Lodge website enquiry — ${subject}`,
+    replyTo: EMAIL.test(email) ? email : undefined,
+    text: [`Name: ${name}`, `Email: ${email || 'Not provided'}`, `Phone / WhatsApp: ${phone || 'Not provided'}`, '', message].join('\n'),
   })
-  if (error) return { ok: false, error: 'Could not send your message. Please try WhatsApp instead.' }
-  return { ok: true }
+
+  if (!delivery.ok && !stored) {
+    return {
+      ok: false,
+      error:
+        delivery.reason === 'not_configured'
+          ? 'Email delivery is not configured yet. Please contact us by WhatsApp.'
+          : 'Could not email your message. Please try WhatsApp instead.',
+    }
+  }
+  return { ok: true, demo: !stored, emailed: delivery.ok }
 }

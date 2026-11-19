@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 export function ContactForm() {
   const [pending, start] = useTransition()
   const [error, setError] = useState<string | null>(null)
-  const [sent, setSent] = useState<{ demo: boolean } | null>(null)
+  const [sent, setSent] = useState<{ emailed: boolean } | null>(null)
 
   if (sent) {
     return (
@@ -19,9 +19,9 @@ export function ContactForm() {
         <CheckCircle2 className="size-8 text-gold" aria-hidden="true" />
         <h2 className="text-2xl">Thank you — we&apos;ll be in touch.</h2>
         <p className="text-muted-foreground">
-          {sent.demo
-            ? 'Demo mode: your message was validated but not stored. Connect Supabase to receive enquiries.'
-            : 'Our team usually replies within a few hours.'}
+          {sent.emailed
+            ? 'Your message has been emailed to Kai Lodge. Our team usually replies within a few hours.'
+            : 'Your message was saved for the Kai Lodge team. Our team usually replies within a few hours.'}
         </p>
       </div>
     )
@@ -43,7 +43,7 @@ export function ContactForm() {
             message: String(f.get('message') ?? ''),
             website: String(f.get('website') ?? ''),
           })
-          if (res.ok) setSent({ demo: Boolean(res.demo) })
+          if (res.ok) setSent({ emailed: Boolean(res.emailed) })
           else setError(res.error ?? 'Something went wrong.')
         })
       }}
