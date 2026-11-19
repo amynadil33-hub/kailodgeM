@@ -34,16 +34,25 @@ on conflict (slug) do nothing;
 
 -- SAMPLE room types (placeholder rates in the base currency)
 insert into public.room_types (slug, name, tagline, description, base_rate, max_adults, max_children, max_guests, bed, sort) values
-  ('queen-room', 'Queen Room', 'Calm, compact and everything you need.',
-   'A restful room with a queen-size bed, Smart TV, coffee, mini refrigerator, hot and cold water and a safe locker.',
-   1000, 2, 1, 3, 'Queen-size bed', 1),
-  ('balcony-city-view', 'Balcony City View Room', 'Morning coffee above the rooftops.',
+  ('queen-room', 'Deluxe Queen Room with City View', 'Comfort with a view across the city.',
+   'A deluxe room with a queen-size bed, city view, Smart TV, coffee, mini refrigerator, hot and cold water and a safe locker.',
+   1200, 2, 1, 3, 'Queen-size bed', 3),
+  ('balcony-city-view', 'Deluxe Queen Room with Balcony', 'Morning coffee above the rooftops.',
    'A private balcony and city view, plus all the essentials of the Queen Room.',
-   1250, 2, 1, 3, 'Queen-size bed', 2),
-  ('recliner-comfort', 'Recliner Comfort Room', 'Put your feet up after a long day.',
+   1200, 2, 1, 3, 'Queen-size bed', 2),
+  ('recliner-comfort', 'Superior Queen Room', 'A calm, comfortable stay with room to unwind.',
    'A recliner and foot massager alongside the queen-size bed, Smart TV and in-room coffee.',
-   1150, 2, 1, 3, 'Queen-size bed', 3)
-on conflict (slug) do nothing;
+   1000, 2, 1, 3, 'Queen-size bed', 1)
+on conflict (slug) do update set
+  name = excluded.name,
+  tagline = excluded.tagline,
+  description = excluded.description,
+  base_rate = excluded.base_rate,
+  max_adults = excluded.max_adults,
+  max_children = excluded.max_children,
+  max_guests = excluded.max_guests,
+  bed = excluded.bed,
+  sort = excluded.sort;
 
 insert into public.room_type_amenities (room_type_id, amenity_id)
 select t.id, a.id

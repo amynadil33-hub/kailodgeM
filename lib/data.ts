@@ -46,7 +46,7 @@ function demoData(): SiteData {
     demo: true,
     settings: DEMO_SETTINGS,
     content: contentDefaults(),
-    roomTypes: DEMO_ROOM_TYPES,
+    roomTypes: [...DEMO_ROOM_TYPES].sort((a, b) => a.sort - b.sort),
     amenities: DEMO_AMENITIES,
     packages: DEMO_PACKAGES,
     places: DEMO_PLACES,
