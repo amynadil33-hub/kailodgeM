@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, MapPin } from 'lucide-react'
+import { MALE_SUNSET_ALT, MALE_SUNSET_IMAGE } from '@/lib/content-schema'
 import type { SiteData } from '@/lib/data'
 import { AmenityIcon } from './amenity-icon'
 import { AvailabilitySearch } from './availability-search'
@@ -40,6 +41,8 @@ export function HomeHero({ content }: { content: SiteData['content'] }) {
 }
 
 export function HomeIntro({ content, address }: { content: SiteData['content']; address: string }) {
+  const image = content['home.intro_image'] || MALE_SUNSET_IMAGE
+
   return (
     <section className="mx-auto grid max-w-7xl gap-10 px-4 py-20 md:grid-cols-12 md:items-center md:px-8 md:py-28">
       <div className="flex flex-col gap-6 md:col-span-6 lg:col-span-5">
@@ -54,8 +57,8 @@ export function HomeIntro({ content, address }: { content: SiteData['content']; 
       </div>
       <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-muted md:col-span-6 lg:col-span-6 lg:col-start-7">
         <Image
-          src={content['home.intro_image'] || '/images/property-entrance.png'}
-          alt="The warm, welcoming Kai Lodge entrance and reception"
+          src={image}
+          alt={image === MALE_SUNSET_IMAGE ? MALE_SUNSET_ALT : ''}
           fill
           sizes="(min-width: 768px) 50vw, 100vw"
           className="object-cover"

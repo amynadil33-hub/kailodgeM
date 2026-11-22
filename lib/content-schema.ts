@@ -8,6 +8,9 @@ export interface ContentField {
   default: string
 }
 
+export const MALE_SUNSET_IMAGE = '/images/male-sunset.webp'
+export const MALE_SUNSET_ALT = 'Illustrated sunset over coastal rooftops and the ocean'
+
 export const CONTENT_FIELDS: ContentField[] = [
   // Home
   { page: 'Home', key: 'home.hero_eyebrow', label: 'Hero eyebrow', type: 'text', default: 'Muranga Magu · Malé' },
@@ -16,7 +19,7 @@ export const CONTENT_FIELDS: ContentField[] = [
   { page: 'Home', key: 'home.hero_image', label: 'Hero photograph', type: 'image', default: '/images/hero-kai-lodge-balcony.png' },
   { page: 'Home', key: 'home.intro_title', label: 'Introduction title', type: 'text', default: 'A city retreat, kept personal.' },
   { page: 'Home', key: 'home.intro_body', label: 'Introduction text', type: 'textarea', default: 'Kai Lodge is a boutique guesthouse for couples, locals visiting the capital, international travellers, business guests and families. Step out into the scooters, cafés and waterfront of Malé — then come back to a quiet, comfortable room that has been prepared around your plans.' },
-  { page: 'Home', key: 'home.intro_image', label: 'Introduction photograph', type: 'image', default: '/images/property-entrance.png' },
+  { page: 'Home', key: 'home.intro_image', label: 'Introduction photograph', type: 'image', default: MALE_SUNSET_IMAGE },
   { page: 'Home', key: 'home.personal_title', label: 'Personalised stay title', type: 'text', default: 'A stay shaped around you.' },
   { page: 'Home', key: 'home.personal_body', label: 'Personalised stay text', type: 'textarea', default: 'Celebrating something? Arriving on a late flight? Staying for a month? Tell us, and we will shape the room and the details around you.' },
   { page: 'Home', key: 'home.city_title', label: 'Neighbourhood title', type: 'text', default: 'The energy of Malé, right outside.' },
@@ -49,7 +52,7 @@ export const CONTENT_FIELDS: ContentField[] = [
   // About
   { page: 'About', key: 'about.title', label: 'Page title', type: 'text', default: 'About Kai Lodge' },
   { page: 'About', key: 'about.story', label: 'Property story', type: 'textarea', default: 'Kai Lodge was created as a comfortable, personal place to stay in central Malé — somewhere that feels calm the moment you close the door, while the life of the city carries on outside. We keep things simple, clean and attentive, and we are always a message away.' },
-  { page: 'About', key: 'about.image', label: 'Story photograph', type: 'image', default: '/images/property-entrance.png' },
+  { page: 'About', key: 'about.image', label: 'Story photograph', type: 'image', default: MALE_SUNSET_IMAGE },
   { page: 'About', key: 'about.igmh_body', label: 'IGMH highlight', type: 'textarea', default: 'Indira Gandhi Memorial Hospital (IGMH) is nearby — convenient for guests visiting Malé for appointments or to be close to family.' },
   { page: 'About', key: 'about.beach_body', label: 'Rasfannu Beach highlight', type: 'textarea', default: 'Rasfannu, Malé’s artificial beach on the western waterfront, is within reach for an evening swim or a walk along the sea.' },
 

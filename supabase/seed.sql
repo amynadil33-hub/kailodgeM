@@ -95,7 +95,6 @@ select v.url, v.alt, v.category, t.id, v.sort
     ('/images/holiday-getaway-swing-chair.jpeg', 'Hanging chair and wardrobe in the Holiday Getaway room', 'room', 'balcony-city-view', 5),
     ('/images/holiday-getaway-bed.jpeg', 'Warmly lit queen bed in the Holiday Getaway room', 'room', 'balcony-city-view', 6),
     ('/images/room-recliner-1.png', 'Room with recliner and foot massager', 'room', 'recliner-comfort', 1),
-    ('/images/property-entrance.png', 'Entrance lobby', 'property', null, 1),
     ('/images/property-kitchen.png', 'Shared guest kitchen', 'property', null, 2),
     ('/images/property-laundry.png', 'Guest laundry', 'property', null, 3),
     ('/images/motorcycle-rental.jpeg', 'Motorcycle rental for in-house guests', 'property', null, 4),

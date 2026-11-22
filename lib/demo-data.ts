@@ -1,3 +1,4 @@
+import { MALE_SUNSET_ALT, MALE_SUNSET_IMAGE } from './content-schema'
 import type {
   Amenity,
   DecorationPackage,
@@ -102,7 +103,6 @@ export const DEMO_MEDIA: MediaItem[] = [
   img('m27', '/images/holiday-getaway-swing-chair.jpeg', 'Hanging chair and wardrobe in the Holiday Getaway room', 'room', 'rt-balcony', 5),
   img('m28', '/images/holiday-getaway-bed.jpeg', 'Warmly lit queen bed in the Holiday Getaway room', 'room', 'rt-balcony', 6),
   img('m6', '/images/room-recliner-1.png', 'Room with a recliner, foot massager and Smart TV', 'room', 'rt-recliner', 1),
-  img('m8', '/images/property-entrance.png', 'Warm, welcoming entrance lobby', 'property', null, 1),
   img('m9', '/images/property-kitchen.png', 'Shared guest kitchen with microwave and rice cooker', 'property', null, 2),
   img('m10', '/images/property-laundry.png', 'Guest laundry with washing machine and iron', 'property', null, 3),
   img('m19', '/images/motorcycle-rental.jpeg', 'Motorcycle rental available for in-house guests', 'property', null, 4),
@@ -121,6 +121,7 @@ export const DEMO_MEDIA: MediaItem[] = [
   img('m16', '/images/male-neighbourhood.png', 'Morning in a residential lane in Malé', 'neighbourhood', null, 4),
   img('m17', '/images/hero-male-street.png', 'Busy street in Malé at golden hour', 'neighbourhood', null, 5),
   img('m18', '/images/hero-male-night.png', 'Malé from above at night', 'neighbourhood', null, 6),
+  img('m8', MALE_SUNSET_IMAGE, MALE_SUNSET_ALT, 'neighbourhood', null, 7),
 ]
 
 const imagesFor = (id: string) => DEMO_MEDIA.filter((m) => m.room_type_id === id)

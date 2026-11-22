@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { HeartPulse, MapPin, Waves } from 'lucide-react'
 import { PageHero } from '@/components/site/page-hero'
 import { Eyebrow, RuleDot } from '@/components/site/rule-dot'
+import { MALE_SUNSET_ALT, MALE_SUNSET_IMAGE } from '@/lib/content-schema'
 import { getSiteData } from '@/lib/data'
 
 export const metadata: Metadata = {
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
 
 export default async function AboutPage() {
   const { content, settings, places } = await getSiteData()
+  const storyImage = content['about.image'] || MALE_SUNSET_IMAGE
 
   return (
     <>
@@ -30,8 +32,8 @@ export default async function AboutPage() {
         </div>
         <div className="relative aspect-[4/3] overflow-hidden rounded-lg lg:col-span-6">
           <Image
-            src={content['about.image'] || '/images/property-entrance.png'}
-            alt="Kai Lodge entrance and reception lobby"
+            src={storyImage}
+            alt={storyImage === MALE_SUNSET_IMAGE ? MALE_SUNSET_ALT : ''}
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover"
