@@ -5,6 +5,7 @@ import { MALE_SUNSET_ALT, MALE_SUNSET_IMAGE } from '@/lib/content-schema'
 import type { SiteData } from '@/lib/data'
 import { AmenityIcon } from './amenity-icon'
 import { AvailabilitySearch } from './availability-search'
+import { PhotoGallery } from './photo-gallery'
 import { Eyebrow, RuleDot } from './rule-dot'
 
 export function HomeHero({ content }: { content: SiteData['content'] }) {
@@ -68,7 +69,7 @@ export function HomeIntro({ content, address }: { content: SiteData['content']; 
   )
 }
 
-export function HomePersonalise({ content, packages }: { content: SiteData['content']; packages: SiteData['packages'] }) {
+export function HomePersonalise({ content, packages, media }: Pick<SiteData, 'content' | 'packages' | 'media'>) {
   const shown = packages.slice(0, 4)
   return (
     <section className="bg-ink text-ink-foreground">
@@ -87,23 +88,28 @@ export function HomePersonalise({ content, packages }: { content: SiteData['cont
             <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
           </Link>
         </div>
-        <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {shown.map((p) => (
-            <li key={p.id} className="flex flex-col gap-4">
-              <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-ink-foreground/5">
-                {p.image_url && (
-                  <Image src={p.image_url} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover" />
-                )}
-              </div>
-              <div className="flex flex-col gap-1">
-                <h3 className="text-xl">{p.name}</h3>
-                {p.description && (
-                  <p className="text-sm leading-relaxed text-ink-foreground/65 line-clamp-2">{p.description}</p>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
+        {shown.length === 0 && (
+          <PhotoGallery items={media.filter((photo) => photo.category === 'occasion').slice(0, 4)} layout="grid" />
+        )}
+        {shown.length > 0 && (
+          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {shown.map((p) => (
+              <li key={p.id} className="flex flex-col gap-4">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-ink-foreground/5">
+                  {p.image_url && (
+                    <Image src={p.image_url} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover" />
+                  )}
+                </div>
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-xl">{p.name}</h3>
+                  {p.description && (
+                    <p className="text-sm leading-relaxed text-ink-foreground/65 line-clamp-2">{p.description}</p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </section>
   )
