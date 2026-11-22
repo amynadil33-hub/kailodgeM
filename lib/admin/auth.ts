@@ -14,8 +14,10 @@ export interface AdminSession {
   supabase: Awaited<ReturnType<typeof createClient>>
 }
 
+export const DEFAULT_OWNER_EMAIL = 'kailodgemv@gmail.com'
+
 function bootstrapOwnerEmails() {
-  return (process.env.ADMIN_OWNER_EMAILS ?? '')
+  return (process.env.ADMIN_OWNER_EMAILS?.trim() || DEFAULT_OWNER_EMAIL)
     .split(',')
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean)

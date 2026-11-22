@@ -38,8 +38,7 @@ export function LoginForm({ next }: { next: string }) {
           email,
           password,
           options: {
-            emailRedirectTo:
-              process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ?? `${window.location.origin}/auth/callback?next=/admin`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=/admin`,
           },
         })
         if (error) {
@@ -51,7 +50,7 @@ export function LoginForm({ next }: { next: string }) {
         }
         setMessage({
           ok: true,
-          text: 'Check your inbox to confirm your email. Once confirmed, an owner can grant you access.',
+          text: 'Check your inbox and confirm your email. The configured owner email receives owner access on first sign-in.',
         })
       }
     } finally {

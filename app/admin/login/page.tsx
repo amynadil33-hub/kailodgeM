@@ -4,13 +4,17 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { LoginForm } from '@/components/admin/login-form'
 import { SignOutButton } from '@/components/admin/sign-out-button'
-import { getAdminSession } from '@/lib/admin/auth'
+import { DEFAULT_OWNER_EMAIL, getAdminSession } from '@/lib/admin/auth'
 import { isSupabaseConfigured } from '@/lib/env'
 import { createClient } from '@/lib/supabase/server'
 
 export const metadata: Metadata = { title: 'Staff sign in', robots: { index: false, follow: false } }
 
-export default async function AdminLoginPage({ searchParams }: { searchParams: Promise<{ next?: string; denied?: string }> }) {
+export default async function AdminLoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string; denied?: string; error?: string }>
+}) {
   const params = await searchParams
   const next = params.next?.startsWith('/admin') && !params.next.startsWith('//') ? params.next : '/admin'
   const configured = isSupabaseConfigured()
@@ -33,7 +37,14 @@ export default async function AdminLoginPage({ searchParams }: { searchParams: P
           <div className="flex flex-col gap-1 text-center">
             <h1 className="font-serif text-2xl">Staff portal</h1>
             <p className="text-sm text-muted-foreground">Reservations, rooms and website content.</p>
+            <p className="text-xs text-muted-foreground">Owner account: {DEFAULT_OWNER_EMAIL}</p>
           </div>
+
+          {params.error === 'confirmation' ? (
+            <p role="alert" className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+              That confirmation link could not be completed. Please request a new email or try signing in again.
+            </p>
+          ) : null}
 
           {!configured ? (
             <div className="flex flex-col gap-2 rounded-md bg-muted p-4 text-sm leading-relaxed">
@@ -41,7 +52,8 @@ export default async function AdminLoginPage({ searchParams }: { searchParams: P
               <p className="text-muted-foreground">
                 Add <code className="font-mono text-xs">NEXT_PUBLIC_SUPABASE_URL</code>,{' '}
                 <code className="font-mono text-xs">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> and{' '}
-                <code className="font-mono text-xs">SUPABASE_SERVICE_ROLE_KEY</code>, run the migrations, then sign in here.
+                <code className="font-mono text-xs">SUPABASE_SERVICE_ROLE_KEY</code>, run the migrations, then create the owner
+                account here.
               </p>
             </div>
           ) : signedInWithoutAccess ? (
