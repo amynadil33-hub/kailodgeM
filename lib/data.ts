@@ -10,7 +10,7 @@ import {
   DEMO_ROOM_TYPES,
   DEMO_SETTINGS,
 } from './demo-data'
-import { isSupabaseConfigured, SUPABASE_ANON_KEY, SUPABASE_URL } from './env'
+import { isSupabaseConfigured, SUPABASE_PUBLIC_KEY, SUPABASE_URL } from './env'
 import type {
   Amenity,
   DecorationPackage,
@@ -36,7 +36,7 @@ export interface SiteData {
 }
 
 function publicClient() {
-  return createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  return createSupabaseClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY, {
     auth: { persistSession: false, autoRefreshToken: false },
   })
 }

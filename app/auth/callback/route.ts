@@ -1,23 +1,23 @@
 import { NextResponse, type NextRequest } from 'next/server'
+import { isSupabaseConfigured } from '@/lib/env'
 import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get('code')
-  const requestedNext = request.nextUrl.searchParams.get('next') ?? '/admin'
-  const next = requestedNext.startsWith('/admin') && !requestedNext.startsWith('//') ? requestedNext : '/admin'
+  const recovery = request.nextUrl.searchParams.get('flow') === 'recovery'
+  const next = request.nextUrl.searchParams.get('next')
+  let location = recovery ? '/auth/reset-password?expired=1' : '/admin/login?confirmation=failed'
 
-  if (code) {
+  if (code && isSupabaseConfigured()) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
-
     if (!error) {
-      return NextResponse.redirect(new URL(next, request.nextUrl.origin))
+      location = recovery ? '/auth/reset-password?verified=1' : '/admin/login'
+      if (!recovery && next && next.startsWith('/admin')) {
+        location += `?${new URLSearchParams({ next })}`
+      }
     }
   }
 
-  const login = request.nextUrl.clone()
-  login.pathname = '/admin/login'
-  login.search = ''
-  login.searchParams.set('error', 'confirmation')
-  return NextResponse.redirect(login)
+  return new NextResponse(null, { status: 303, headers: { location } })
 }

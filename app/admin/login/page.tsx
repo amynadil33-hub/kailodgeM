@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: 'Staff sign in', robots: { index: fal
 export default async function AdminLoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string; denied?: string; error?: string }>
+  searchParams: Promise<{ next?: string; confirmation?: string; error?: string }>
 }) {
   const params = await searchParams
   const next = params.next?.startsWith('/admin') && !params.next.startsWith('//') ? params.next : '/admin'
@@ -40,20 +40,11 @@ export default async function AdminLoginPage({
             <p className="text-xs text-muted-foreground">Owner account: {DEFAULT_OWNER_EMAIL}</p>
           </div>
 
-          {params.error === 'confirmation' ? (
-            <p role="alert" className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-              That confirmation link could not be completed. Please request a new email or try signing in again.
-            </p>
-          ) : null}
-
           {!configured ? (
             <div className="flex flex-col gap-2 rounded-md bg-muted p-4 text-sm leading-relaxed">
               <p className="font-medium">Supabase is not connected yet.</p>
               <p className="text-muted-foreground">
-                Add <code className="font-mono text-xs">NEXT_PUBLIC_SUPABASE_URL</code>,{' '}
-                <code className="font-mono text-xs">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> and{' '}
-                <code className="font-mono text-xs">SUPABASE_SERVICE_ROLE_KEY</code>, run the migrations, then create the owner
-                account here.
+                Connect the project in Vercel, set the Supabase environment variables, and apply the database migrations.
               </p>
             </div>
           ) : signedInWithoutAccess ? (
@@ -65,7 +56,15 @@ export default async function AdminLoginPage({
               <SignOutButton />
             </div>
           ) : (
-            <LoginForm next={next} />
+            <>
+              {(params.confirmation === 'failed' || params.error === 'confirmation') && (
+                <p role="alert" className="text-sm text-destructive">
+                  We couldn’t finish email confirmation in this browser. If your email is confirmed, sign in below.
+                  Otherwise, open a fresh confirmation link in the browser where you created the account.
+                </p>
+              )}
+              <LoginForm next={next} />
+            </>
           )}
         </div>
         <Link href="/" className="text-center text-sm text-ink-foreground/70 hover:text-ink-foreground">

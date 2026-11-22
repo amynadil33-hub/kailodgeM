@@ -19,8 +19,8 @@ export function LoginForm({ next }: { next: string }) {
     e.preventDefault()
     setBusy(true)
     setMessage(null)
-    const supabase = createClient()
     try {
+      const supabase = createClient()
       if (mode === 'sign-in') {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) {
@@ -38,21 +38,25 @@ export function LoginForm({ next }: { next: string }) {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=/admin`,
+            emailRedirectTo:
+              process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ?? `${window.location.origin}/auth/callback`,
           },
         })
         if (error) {
           const code = (error as { code?: string }).code
           if (code === 'weak_password') setMessage({ ok: false, text: 'Choose a stronger password (at least 8 characters).' })
+          else if (code === 'email_address_not_authorized') setMessage({ ok: false, text: 'This address cannot receive confirmation emails yet. Ask the site owner to configure staff email delivery.' })
           else if (error.status === 429) setMessage({ ok: false, text: 'Too many attempts. Please wait a minute and try again.' })
           else setMessage({ ok: false, text: 'We could not create the account. Please try again.' })
           return
         }
         setMessage({
           ok: true,
-          text: 'Check your inbox and confirm your email. The configured owner email receives owner access on first sign-in.',
+          text: 'Check your inbox and open the confirmation link in this browser. An owner can then grant you access.',
         })
       }
+    } catch {
+      setMessage({ ok: false, text: 'Authentication is unavailable right now. Please try again.' })
     } finally {
       setBusy(false)
     }
@@ -84,6 +88,11 @@ export function LoginForm({ next }: { next: string }) {
       <Button type="submit" disabled={busy} className="w-full">
         {busy ? 'Please wait…' : mode === 'sign-in' ? 'Sign in' : 'Create staff account'}
       </Button>
+      {mode === 'sign-in' && (
+        <a href="/auth/reset-password" className="text-center text-sm text-muted-foreground hover:underline">
+          Forgot password?
+        </a>
+      )}
       <button
         type="button"
         className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"

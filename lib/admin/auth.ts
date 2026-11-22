@@ -35,15 +35,23 @@ export const getAdminSession = cache(async (): Promise<AdminSession | null> => {
   } = await supabase.auth.getUser()
   if (!user) return null
 
-  const { data: row } = await supabase.from('admin_users').select('role').eq('user_id', user.id).maybeSingle()
+  const { data: row, error: roleError } = await supabase.from('admin_users').select('role').eq('user_id', user.id).maybeSingle()
+  if (roleError) return null
   let role = (row?.role as AdminRole | undefined) ?? null
 
   const email = (user.email ?? '').toLowerCase()
   if (!role && user.email_confirmed_at && hasServiceRole() && bootstrapOwnerEmails().includes(email)) {
-    const { error } = await createServiceClient()
+    const service = createServiceClient()
+    const { data: created, error } = await service
       .from('admin_users')
-      .upsert({ user_id: user.id, role: 'owner' }, { onConflict: 'user_id' })
-    if (!error) role = 'owner'
+      .upsert({ user_id: user.id, role: 'owner' }, { onConflict: 'user_id', ignoreDuplicates: true })
+      .select('role')
+      .maybeSingle()
+    if (!error) {
+      // A concurrent request may have created the row first. Preserve the role it wrote.
+      const existing = created ?? (await service.from('admin_users').select('role').eq('user_id', user.id).maybeSingle()).data
+      role = (existing?.role as AdminRole | undefined) ?? null
+    }
   }
 
   if (!role) return null

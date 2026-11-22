@@ -414,7 +414,7 @@ export async function addTeamMember(email: string, role: string): Promise<Result
     if (!['admin', 'staff', 'owner'].includes(role)) return { ok: false, error: 'Choose a role.' }
     const target = clean(email, 200).toLowerCase()
     const { hasServiceRole } = await import('@/lib/env')
-    if (!hasServiceRole()) return { ok: false, error: 'Add SUPABASE_SERVICE_ROLE_KEY to manage the team.' }
+    if (!hasServiceRole()) return { ok: false, error: 'Configure a Supabase server key to manage the team.' }
     const { createServiceClient } = await import('@/lib/supabase/service')
     const service = createServiceClient()
     let found: string | null = null
