@@ -1,8 +1,12 @@
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
+import { Images } from 'lucide-react'
 import { AdminPageHeader } from '@/components/admin/admin-page-header'
 import { RecordManager, type Column } from '@/components/admin/record-manager'
-import { AmenityAssigner } from '@/components/admin/amenity-assigner'
+import { RoomTypeRecordManager } from '@/components/admin/room-type-record-manager'
+import type { AdminRoomPhoto } from '@/components/admin/room-type-photo-manager'
 import { RoomCatalogueBootstrap } from '@/components/admin/room-catalogue-bootstrap'
+import { Button } from '@/components/ui/button'
 import { requireAdmin } from '@/lib/admin/auth'
 import { isResourceKey, RESOURCES, type FieldDef } from '@/lib/admin/resources'
 import { hasServiceRole } from '@/lib/env'
@@ -46,12 +50,20 @@ export default async function ManagePage({ params }: { params: Promise<{ resourc
   for (const o of def.order) query = query.order(o.column, { ascending: o.ascending })
 
   const needsRoomTypes = fields.some((f) => f.ref === 'room_types') || resource === 'room_types'
-  const [rowsResult, roomTypes, settings, amenities, links] = await Promise.all([
+  const [rowsResult, roomTypes, settings, amenities, links, roomPhotos] = await Promise.all([
     query,
     needsRoomTypes ? supabase.from('room_types').select('id, name').order('sort') : Promise.resolve({ data: [] }),
     supabase.from('site_settings').select('base_currency').eq('id', 1).maybeSingle(),
     resource === 'room_types' ? supabase.from('amenities').select('id, name').order('name') : Promise.resolve({ data: [] }),
     resource === 'room_types' ? supabase.from('room_type_amenities').select('room_type_id, amenity_id') : Promise.resolve({ data: [] }),
+    resource === 'room_types'
+      ? supabase
+          .from('media')
+          .select('id, url, alt, sort, room_type_id')
+          .eq('category', 'room')
+          .not('room_type_id', 'is', null)
+          .order('sort')
+      : Promise.resolve({ data: [] }),
   ])
 
   const rows = rowsResult.data ?? []
@@ -59,11 +71,30 @@ export default async function ManagePage({ params }: { params: Promise<{ resourc
   const refOptions = ((roomTypes.data ?? []) as { id: string; name: string }[]).map((r) => ({ value: r.id, label: r.name }))
   const allAmenities = (amenities.data ?? []) as { id: string; name: string }[]
   const linkRows = (links.data ?? []) as { room_type_id: string; amenity_id: string }[]
+  const photos = (roomPhotos.data ?? []) as AdminRoomPhoto[]
   const meta = TITLES[resource]
+  const emptyMessage = loadError
+    ? 'Unable to read this table. Apply the latest Supabase Data API grants migration and reload.'
+    : resource === 'room_types'
+      ? 'No room types are stored in Supabase yet.'
+      : resource === 'rooms'
+        ? 'No physical rooms are stored in Supabase yet.'
+        : undefined
 
   return (
     <>
-      <AdminPageHeader title={meta.title} description={meta.description} />
+      <AdminPageHeader
+        title={meta.title}
+        description={meta.description}
+        actions={
+          resource === 'rooms' ? (
+            <Button variant="outline" render={<Link href="/admin/manage/room_types" />} nativeButton={false}>
+              <Images aria-hidden="true" />
+              Manage room photos
+            </Button>
+          ) : undefined
+        }
+      />
       {(resource === 'room_types' || resource === 'rooms') && (rows.length === 0 || loadError) ? (
         <RoomCatalogueBootstrap
           resource={resource}
@@ -71,35 +102,29 @@ export default async function ManagePage({ params }: { params: Promise<{ resourc
           loadError={loadError}
         />
       ) : null}
-      <RecordManager
-        resource={resource}
-        singular={def.singular}
-        fields={fields}
-        rows={(rows ?? []) as (Record<string, unknown> & { id: string })[]}
-        columns={columnsFor(fields)}
-        refOptions={refOptions}
-        currency={settings.data?.base_currency ?? 'MVR'}
-        emptyMessage={
-          loadError
-            ? 'Unable to read this table. Apply the latest Supabase Data API grants migration and reload.'
-            : resource === 'room_types'
-              ? 'No room types are stored in Supabase yet.'
-              : resource === 'rooms'
-                ? 'No physical rooms are stored in Supabase yet.'
-                : undefined
-        }
-        extra={
-          resource === 'room_types'
-            ? (row) => (
-                <AmenityAssigner
-                  roomTypeId={String(row.id)}
-                  amenities={allAmenities}
-                  selected={linkRows.filter((l) => l.room_type_id === row.id).map((l) => l.amenity_id)}
-                />
-              )
-            : undefined
-        }
-      />
+      {resource === 'room_types' ? (
+        <RoomTypeRecordManager
+          fields={fields}
+          rows={rows as (Record<string, unknown> & { id: string })[]}
+          columns={columnsFor(fields)}
+          currency={settings.data?.base_currency ?? 'MVR'}
+          emptyMessage={emptyMessage}
+          amenities={allAmenities}
+          amenityLinks={linkRows}
+          photos={photos}
+        />
+      ) : (
+        <RecordManager
+          resource={resource}
+          singular={def.singular}
+          fields={fields}
+          rows={rows as (Record<string, unknown> & { id: string })[]}
+          columns={columnsFor(fields)}
+          refOptions={refOptions}
+          currency={settings.data?.base_currency ?? 'MVR'}
+          emptyMessage={emptyMessage}
+        />
+      )}
     </>
   )
 }

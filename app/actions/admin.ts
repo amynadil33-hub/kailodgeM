@@ -133,6 +133,87 @@ export async function setRoomTypeAmenities(roomTypeId: string, amenityIds: strin
   }
 }
 
+export async function addRoomTypePhoto(input: {
+  roomTypeId: string
+  url: string
+  storagePath: string
+  alt: string
+}): Promise<ActionResult> {
+  try {
+    if (!/^[0-9a-f-]{36}$/i.test(input.roomTypeId)) return { ok: false, error: 'Unknown room type.' }
+    const url = input.url.trim()
+    if (url.length > 2048 || !(url.startsWith('/') || /^https:\/\//.test(url))) {
+      return { ok: false, error: 'The uploaded photo URL is invalid.' }
+    }
+    const storagePath = input.storagePath.trim()
+    if (!/^rooms\/[0-9a-f-]{36}\/[a-z0-9-]+\.(?:jpe?g|png|webp|avif)$/i.test(storagePath)) {
+      return { ok: false, error: 'The uploaded photo path is invalid.' }
+    }
+
+    const { supabase } = await adminForAction()
+    const [roomTypeResult, lastPhotoResult] = await Promise.all([
+      supabase.from('room_types').select('id, name').eq('id', input.roomTypeId).maybeSingle(),
+      supabase
+        .from('media')
+        .select('sort')
+        .eq('room_type_id', input.roomTypeId)
+        .eq('category', 'room')
+        .order('sort', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ])
+    if (roomTypeResult.error) return fail(roomTypeResult.error)
+    if (lastPhotoResult.error) return fail(lastPhotoResult.error)
+    const roomType = roomTypeResult.data
+    const lastPhoto = lastPhotoResult.data
+    if (!roomType) return { ok: false, error: 'Room type not found.' }
+
+    const alt = input.alt.trim().slice(0, 300) || `${roomType.name} photo`
+    const { error } = await supabase.from('media').insert({
+      url,
+      storage_path: storagePath,
+      alt,
+      caption: null,
+      category: 'room',
+      room_type_id: input.roomTypeId,
+      sort: Number(lastPhoto?.sort ?? 0) + 1,
+    })
+    if (error) return fail(error)
+    refreshSite()
+    revalidatePath('/admin/manage/room_types')
+    return { ok: true, message: 'Room photo uploaded.' }
+  } catch (e) {
+    return fail(e)
+  }
+}
+
+export async function deleteRoomTypePhoto(photoId: string): Promise<ActionResult> {
+  try {
+    if (!/^[0-9a-f-]{36}$/i.test(photoId)) return { ok: false, error: 'Unknown photo.' }
+    const { supabase } = await adminForAction()
+    const { data: photo, error: readError } = await supabase
+      .from('media')
+      .select('id, storage_path')
+      .eq('id', photoId)
+      .eq('category', 'room')
+      .maybeSingle()
+    if (readError) return fail(readError)
+    if (!photo) return { ok: false, error: 'Photo not found.' }
+
+    const { error } = await supabase.from('media').delete().eq('id', photoId)
+    if (error) return fail(error)
+    if (photo.storage_path) {
+      const { error: storageError } = await supabase.storage.from('media').remove([photo.storage_path])
+      if (storageError) console.error('[admin] deleted photo row but could not remove storage object', storageError.message)
+    }
+    refreshSite()
+    revalidatePath('/admin/manage/room_types')
+    return { ok: true, message: 'Room photo removed.' }
+  } catch (e) {
+    return fail(e)
+  }
+}
+
 /**
  * Copies the three Kai Lodge room categories into an empty live catalogue.
  * Physical room placeholders stay inactive until an owner gives them their real names.
