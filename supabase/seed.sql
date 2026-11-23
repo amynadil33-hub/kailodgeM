@@ -71,9 +71,14 @@ select t.id, a.id from public.room_types t join public.amenities a on a.slug in 
  where t.slug = 'recliner-comfort'
 on conflict do nothing;
 
--- SAMPLE physical rooms — rename/add to match the real property.
-insert into public.rooms (room_type_id, name)
-select id, 'Sample Room ' || sort from public.room_types
+-- Safe physical-room placeholders. Rename each one to the real room number/name before activating it.
+insert into public.rooms (room_type_id, name, active, notes)
+select
+  id,
+  'Setup required — ' || slug,
+  false,
+  'Rename this to the real room number or name, then activate it.'
+from public.room_types
 on conflict (name) do nothing;
 
 -- SAMPLE fixed-price decoration packages (set price to null to make one quote-only)

@@ -16,7 +16,9 @@ For a Supabase project created in v0, open its resource from the Vercel team’s
    - `supabase/migrations/20261119000001_update_room_categories_and_prices.sql`
    - `supabase/migrations/20261122000001_staff_portal_data_api_grants.sql`
 
-   Run `supabase/seed.sql` only if you want the sample inventory on a fresh database.
+   On a fresh database, either run `supabase/seed.sql` or sign in as the owner and use **Room types → Load Kai Lodge catalogue**.
+   Both options create the three Kai Lodge categories. Physical-room placeholders remain inactive until you rename and activate them,
+   so they cannot accidentally accept bookings.
 3. In **Project Settings → API**, copy the project URL, publishable/anon key, and server-only secret/service-role key.
 4. In **Authentication → URL Configuration**, set the production **Site URL** and add the callback and password recovery redirect URLs:
    - `http://localhost:3000/auth/callback`

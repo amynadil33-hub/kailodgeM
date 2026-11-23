@@ -27,6 +27,7 @@ export function RecordManager({
   canDelete = true,
   currency,
   extra,
+  emptyMessage,
 }: {
   resource: string
   singular: string
@@ -37,6 +38,7 @@ export function RecordManager({
   canDelete?: boolean
   currency?: string
   extra?: (row: Row) => React.ReactNode
+  emptyMessage?: string
 }) {
   const router = useRouter()
   const [editing, setEditing] = useState<string | 'new' | null>(null)
@@ -124,7 +126,9 @@ export function RecordManager({
       {editing === 'new' ? editor(null) : null}
 
       {rows.length === 0 && editing !== 'new' ? (
-        <p className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">Nothing here yet.</p>
+        <p className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+          {emptyMessage ?? 'Nothing here yet.'}
+        </p>
       ) : null}
 
       <ul className="flex flex-col divide-y rounded-lg border bg-card">

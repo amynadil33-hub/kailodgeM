@@ -5,6 +5,9 @@ import { adminForAction, AdminActionError } from '@/lib/admin/auth'
 import { isResourceKey, RESOURCES, type FieldDef } from '@/lib/admin/resources'
 import { isISODate } from '@/lib/format'
 import { CONTENT_FIELDS } from '@/lib/content-schema'
+import { DEMO_AMENITIES, DEMO_MEDIA, DEMO_ROOM_TYPES } from '@/lib/demo-data'
+import { hasServiceRole } from '@/lib/env'
+import { createServiceClient } from '@/lib/supabase/service'
 
 export type ActionResult = { ok: true; message?: string } | { ok: false; error: string }
 
@@ -125,6 +128,141 @@ export async function setRoomTypeAmenities(roomTypeId: string, amenityIds: strin
     }
     refreshSite()
     return { ok: true, message: 'Amenities updated.' }
+  } catch (e) {
+    return fail(e)
+  }
+}
+
+/**
+ * Copies the three Kai Lodge room categories into an empty live catalogue.
+ * Physical room placeholders stay inactive until an owner gives them their real names.
+ */
+export async function importKaiLodgeCatalogue(): Promise<ActionResult> {
+  try {
+    const session = await adminForAction()
+    if (session.role !== 'owner') return { ok: false, error: 'Only an owner can load the room catalogue.' }
+    if (!hasServiceRole()) {
+      return { ok: false, error: 'Add the Supabase server secret and redeploy before loading the catalogue.' }
+    }
+
+    const service = createServiceClient()
+    const typeSlugs = DEMO_ROOM_TYPES.map((room) => room.slug)
+    const amenitySlugs = DEMO_AMENITIES.map((amenity) => amenity.slug)
+
+    const { error: typeInsertError } = await service.from('room_types').upsert(
+      DEMO_ROOM_TYPES.map((room) => ({
+        slug: room.slug,
+        name: room.name,
+        tagline: room.tagline,
+        description: room.description,
+        base_rate: room.base_rate,
+        max_adults: room.max_adults,
+        max_children: room.max_children,
+        max_guests: room.max_guests,
+        bed: room.bed,
+        active: room.active,
+        sort: room.sort,
+      })),
+      { onConflict: 'slug', ignoreDuplicates: true },
+    )
+    if (typeInsertError) return fail(typeInsertError)
+
+    const { error: amenityInsertError } = await service.from('amenities').upsert(
+      DEMO_AMENITIES.map((amenity) => ({
+        slug: amenity.slug,
+        name: amenity.name,
+        icon: amenity.icon,
+        scope: amenity.scope,
+        description: amenity.description,
+        sort: amenity.sort,
+      })),
+      { onConflict: 'slug', ignoreDuplicates: true },
+    )
+    if (amenityInsertError) return fail(amenityInsertError)
+
+    const [{ data: types, error: typeReadError }, { data: amenities, error: amenityReadError }] = await Promise.all([
+      service.from('room_types').select('id, slug, name').in('slug', typeSlugs),
+      service.from('amenities').select('id, slug').in('slug', amenitySlugs),
+    ])
+    if (typeReadError) return fail(typeReadError)
+    if (amenityReadError) return fail(amenityReadError)
+
+    const typeBySlug = new Map((types ?? []).map((room) => [room.slug, room]))
+    const amenityBySlug = new Map((amenities ?? []).map((amenity) => [amenity.slug, amenity.id]))
+
+    const amenityLinks = DEMO_ROOM_TYPES.flatMap((room) => {
+      const savedType = typeBySlug.get(room.slug)
+      if (!savedType) return []
+      return room.amenity_ids.flatMap((demoId) => {
+        const amenityId = amenityBySlug.get(demoId.replace(/^amenity-/, ''))
+        return amenityId ? [{ room_type_id: savedType.id, amenity_id: amenityId }] : []
+      })
+    })
+    if (amenityLinks.length) {
+      const { error } = await service
+        .from('room_type_amenities')
+        .upsert(amenityLinks, { onConflict: 'room_type_id,amenity_id', ignoreDuplicates: true })
+      if (error) return fail(error)
+    }
+
+    const linkedMedia = DEMO_MEDIA.flatMap((photo) => {
+      const demoType = DEMO_ROOM_TYPES.find((room) => room.id === photo.room_type_id)
+      const savedType = demoType ? typeBySlug.get(demoType.slug) : null
+      if (!savedType) return []
+      return [{
+        url: photo.url,
+        alt: photo.alt,
+        caption: photo.caption,
+        category: photo.category,
+        room_type_id: savedType.id,
+        sort: photo.sort,
+      }]
+    })
+
+    if (linkedMedia.length) {
+      const urls = linkedMedia.map((photo) => photo.url)
+      const { data: existingMedia, error: mediaReadError } = await service.from('media').select('id, url').in('url', urls)
+      if (mediaReadError) return fail(mediaReadError)
+      const mediaIdByUrl = new Map((existingMedia ?? []).map((photo) => [photo.url, photo.id]))
+      const mediaResults = await Promise.all(
+        linkedMedia.map((photo) => {
+          const id = mediaIdByUrl.get(photo.url)
+          return id ? service.from('media').update(photo).eq('id', id) : service.from('media').insert(photo)
+        }),
+      )
+      const mediaError = mediaResults.find((result) => result.error)?.error
+      if (mediaError) return fail(mediaError)
+    }
+
+    const typeIds = (types ?? []).map((room) => room.id)
+    const { data: existingRooms, error: roomsReadError } = await service
+      .from('rooms')
+      .select('room_type_id')
+      .in('room_type_id', typeIds)
+    if (roomsReadError) return fail(roomsReadError)
+
+    const roomTypeIdsWithInventory = new Set((existingRooms ?? []).map((room) => room.room_type_id))
+    const placeholders = (types ?? [])
+      .filter((room) => !roomTypeIdsWithInventory.has(room.id))
+      .map((room) => ({
+        room_type_id: room.id,
+        name: `Setup required — ${room.slug}`,
+        floor: null,
+        active: false,
+        notes: `Rename this to the real room number or name for ${room.name}, then activate it.`,
+      }))
+    if (placeholders.length) {
+      const { error } = await service.from('rooms').upsert(placeholders, { onConflict: 'name', ignoreDuplicates: true })
+      if (error) return fail(error)
+    }
+
+    refreshSite()
+    revalidatePath('/admin/manage/room_types')
+    revalidatePath('/admin/manage/rooms')
+    return {
+      ok: true,
+      message: 'Kai Lodge room types loaded. Rename each inactive room placeholder, then activate the real rooms.',
+    }
   } catch (e) {
     return fail(e)
   }
